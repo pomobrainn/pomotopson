@@ -12,7 +12,27 @@ import path from 'path';
 import { app, BrowserWindow } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import packager from 'electron-packager';
 import MenuBuilder from './menu';
+import express from 'express';
+
+const expressApp = express();
+
+const options = {
+  dir: './',
+  version: '0.34.1', // electron version
+  platform: 'darwin',
+  arch: 'x64',
+  protocols: [
+    {
+      name: 'pomotopson',
+      schemes: ['pomotopson']
+    }
+  ]
+};
+packager(options, err => {
+  if (err) throw err;
+});
 
 export default class AppUpdater {
   constructor() {
@@ -114,4 +134,15 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) createWindow();
+});
+
+expressApp.listen(2000, () => {
+  console.log('Express app listening on port 2000!');
+});
+
+expressApp.get('/', (req, res) => {
+  console.log(req);
+  res.send(
+    `<script>window.location = "pomotopson://" + window.location.search </script>`
+  );
 });

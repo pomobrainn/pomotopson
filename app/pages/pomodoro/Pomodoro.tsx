@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Timer from 'react-compound-timer';
 
+import { getAuthorization } from './../../api/slack';
+
 const Pomodoro = () => {
   const initialTime = 25 * 60 * 1000;
+
+  const asyncAuth = async () => {
+    const response = await getAuthorization();
+    window.open(response.request.responseURL);
+  };
+
+  useEffect(() => {
+    asyncAuth();
+  }, []);
 
   return (
     <>
@@ -17,7 +28,7 @@ const Pomodoro = () => {
           }
         ]}
       >
-        {({ start, resume, pause, stop }: any) => (
+        {({ start, resume, pause, stop, reset }: any) => (
           <React.Fragment>
             <div>
               <Timer.Minutes /> minutes
@@ -29,6 +40,7 @@ const Pomodoro = () => {
               <button onClick={pause}>Pause</button>
               <button onClick={resume}>Resume</button>
               <button onClick={stop}>Stop</button>
+              <button onClick={reset}>Reset</button>
             </div>
           </React.Fragment>
         )}
